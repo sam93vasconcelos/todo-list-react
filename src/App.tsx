@@ -61,10 +61,6 @@ function App() {
     localStorage.setItem('@my-list:items', JSON.stringify(items));
   }
 
-  function clean() {
-    setItems([]);
-  }
-
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.code === 'Enter') {
       addItem();
@@ -88,7 +84,6 @@ function App() {
       </ul>
 
       <div className="add-button-wrapper">
-        <button className="add-button" onClick={clean}>Limpar</button>
         <button className="add-button" onClick={addItem}>Adicionar</button>
       </div>
     </main>
