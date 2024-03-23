@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Item {
   id: number;
@@ -17,6 +17,10 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    persist();
+  }, [items]);
+
   function handleChange(data: Item) {
     const currentItems = items.map((item) => {
       if (item.id === data.id) {
@@ -28,11 +32,14 @@ function App() {
     })
 
     setItems(currentItems);
-    persist();
   }
 
-  function persist() {
-    localStorage.setItem('@my-list:items', JSON.stringify(items));
+  function removeItem(id: number) {
+    const filteredItems = items.filter((i) => i.id !== id);
+
+    setTimeout(() => {
+      setItems(filteredItems);
+    });
   }
 
   function addItem() {
@@ -44,11 +51,24 @@ function App() {
     }
 
     setItems([...items, { id, description: '', checked: false }]);
+
+    setTimeout(() => {
+      document.getElementById(`input-${id}`)?.focus();
+    });
   }
 
-  function removeItem(id: number) {
-    setItems(items.filter((i) => i.id !== id));
-    persist();
+  function persist() {
+    localStorage.setItem('@my-list:items', JSON.stringify(items));
+  }
+
+  function clean() {
+    setItems([]);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.code === 'Enter') {
+      addItem();
+    }
   }
 
   return (
@@ -60,7 +80,7 @@ function App() {
           items?.map((item) => (
             <li key={item.id}>
               <input type="checkbox" checked={item.checked} onChange={(e) => handleChange({ id: item.id, description: item.description, checked: e.target.checked })} />
-              <input type="text" value={item.description} onChange={(e) => handleChange({ id: item.id, description: e.target.value, checked: item.checked })} />
+              <input id={`input-${item.id}`} type="text" value={item.description} onChange={(e) => handleChange({ id: item.id, description: e.target.value, checked: item.checked })} onKeyDown={handleKeyDown} />
               <button onClick={() => removeItem(item.id)}>X</button>
             </li>
           ))
@@ -68,6 +88,7 @@ function App() {
       </ul>
 
       <div className="add-button-wrapper">
+        <button className="add-button" onClick={clean}>Limpar</button>
         <button className="add-button" onClick={addItem}>Adicionar</button>
       </div>
     </main>
